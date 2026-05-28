@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  SERVED
+  PAID
+  CANCELLED
+}
+
+enum OrderItemStatus {
+  PENDING // Mới gọi
+  CONFIRMED // Nhân viên xác nhận
+  COOKING // Đang làm món
+  READY // Làm xong
+  SERVED // Đã phục vụ
+  CANCELLED // Đã hủy
+}
+
+enum PaymentMethod {
+  CASH
+  BANKING
+  MOMO
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  dishes Dish[]
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Dish {
+  id Int @id @default(autoincrement())
+
+  name      String
+  price     Int
+  image     String?
+  available String  @default("1")
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  orders OrderItem[]
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Table {
+  id Int @id @default(autoincrement())
+
+  name     String
+  capacity Int?
+
+  status TableStatus @default(AVAILABLE)
+
+  orders Order[]
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id     Int         @id @default(autoincrement())
+  status OrderStatus @default(PENDING)
+
+  tableId Int
+  table   Table @relation(fields: [tableId], references: [id])
+
+  items OrderItem[]
+
+  payment Payment?
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  dishId Int
+  dish   Dish @relation(fields: [dishId], references: [id])
+
+  quantity Int
+
+  price Int
+
+  note String?
+
+  status OrderItemStatus @default(PENDING)
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+
+  // Ý nghĩa @unique: trong toàn bộ record của
+  // payment, không có 2 giá trị orderId giống nhau
+  // Tức là, mỗi Order chỉ có duy nhất 1 Payment
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id])
+
+  amount Int
+
+  method PaymentMethod @default(CASH)
+
+  status PaymentStatus @default(PENDING)
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

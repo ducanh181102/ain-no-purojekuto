@@ -1,6 +1,21 @@
 import { Module } from '@nestjs/common';
+import { PrismaModule } from './prisma/prisma.module';
+import { DishModule } from './modules/dish/dish.module';
+import { CategoryModule } from './modules/category/category.module';
+import { OrderModule } from './modules/order/order.module';
+import { TableModule } from './modules/table/table.module';
+import { OrderItemModule } from './modules/orderitem/order-item.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
-  imports: [],
+  imports: [
+    PrismaModule, 
+    CategoryModule, 
+    DishModule, 
+    TableModule,
+    OrderModule, 
+    OrderItemModule,
+    PaymentModule,
+  ],
 })
 export class AppModule {}
