@@ -144,7 +144,7 @@ model Payment {
   orderId Int   @unique
   order   Order @relation(fields: [orderId], references: [id])
 
-  amount Int
+  amount Int 
 
   method PaymentMethod @default(CASH)
 

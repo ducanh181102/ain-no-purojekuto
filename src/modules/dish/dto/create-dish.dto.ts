@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -19,6 +19,7 @@ export class CreateDishDto {
   @ApiProperty({
     example: '30',
   })
+  @Min(1)
   price!: number;
 
   // có thể gửi hoặc không

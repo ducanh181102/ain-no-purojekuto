@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
@@ -14,10 +24,10 @@ export class TableController {
     return this.tableService.findAll();
   }
 
-  @Get()
-  findTableById(id: number) {
+  @Get(':id')
+  findTableById(@Param('id', ParseIntPipe) id: number) {
     // Lấy 1 bàn ăn bằng ID
-    return this.tableService.findOne(id)
+    return this.tableService.findOneOrThrow(id);
   }
 
   @Post()
@@ -26,14 +36,29 @@ export class TableController {
     return this.tableService.create(dto);
   }
 
-  @Patch()
-  updateTableById(@Body() dto: UpdateTableDto, id: number)  {
+  @Patch(':id')
+  updateTableById(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateTableDto,
+  ) {
+    const allowedFields = ['name', 'capacity'];
+    const invalidFields = Object.entries(dto)
+      .filter(([, value]) => value !== undefined)
+      .map(([field]) => field)
+      .filter((field) => !allowedFields.includes(field));
+
+    if (invalidFields.length) {
+      throw new BadRequestException(
+        `Không được cập nhật trực tiếp: ${invalidFields.join(', ')}`,
+      );
+    }
+
     // Cập nhật 1 bàn ăn theo id
     return this.tableService.update(id, dto);
   }
 
-  @Patch()
-  deleteLogicTableById(id: number) {
+  @Delete(':id')
+  deleteLogicTableById(@Param('id', ParseIntPipe) id: number) {
     // Xóa logic 1 bàn ăn
     return this.tableService.delete(id);
   }

@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
@@ -14,26 +24,29 @@ export class PaymentController {
     return this.paymentService.findAll();
   }
 
-  @Get()
-  findPaymentById(id: number) {
+  @Get(':id')
+  findPaymentById(@Param('id', ParseIntPipe) id: number) {
     // Lấy 1 đơn hàng bằng ID
-    return this.paymentService.findOne(id)
+    return this.paymentService.findOneOrThrow(id);
   }
 
   @Post()
   createPayment(@Body() dto: CreatePaymentDto) {
-    // Thêm một đơn hàng
-    return this.paymentService.create(dto);
+    // Chặn không cho client thao tác trực tiếp
+    throw new BadRequestException('Không được tạo payment trực tiếp');
   }
 
-  @Patch()
-  updatePaymentById(@Body() dto: UpdatePaymentDto, id: number)  {
-    // Cập nhật 1 đơn hàng theo id
-    return this.paymentService.update(id, dto);
+  @Patch(':id')
+  updatePaymentById(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePaymentDto,
+  ) {
+    // Chặn không cho client thao tác trực tiếp
+    throw new BadRequestException('Không được cập nhật payment trực tiếp');
   }
 
-  @Patch()
-  deleteLogicPaymentById(id: number) {
+  @Delete(':id')
+  deleteLogicPaymentById(@Param('id', ParseIntPipe) id: number) {
     // Xóa logic 1 đơn hàng
     return this.paymentService.delete(id);
   }

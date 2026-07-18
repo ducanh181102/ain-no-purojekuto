@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateDishDto {
@@ -12,6 +12,7 @@ export class UpdateDishDto {
   @Type(()=>Number)
   @IsOptional()
   @IsNumber()
+  @Min(1)
   price?: number;
 
   // có thể gửi hoặc không

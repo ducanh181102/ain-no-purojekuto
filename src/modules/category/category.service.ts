@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -25,6 +25,26 @@ export class CategoryService {
   findOne(id: number): Promise<Category | null> {
     return this.prisma.category.findUnique({ where: { id } });
   }
+
+  // Lấy Category có thông tin
+  async findOneOrThrow(id: number): Promise<Category> {
+    // 1. Tìm Category
+    const category = await this.findOne(id);
+
+    // 2. Category có tồn tại không
+    if (!category) {
+      throw new NotFoundException('Category không tồn tại');
+    }
+
+    // 3. Category có bị xoá không
+    if (category.isDeleted === '1') {
+      throw new NotFoundException('Category đã bị xoá');
+    }
+
+    // 4. Trả trị
+    return category;
+  }
+
   // Tạo mới một loại món ăn
   create(dto: CreateCategoryDto): Promise<Category> {
     return this.prisma.category.create({ data: dto });

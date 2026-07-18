@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -14,10 +23,10 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
-  @Get()
-  findCategoryById(id: number) {
+  @Get(':id')
+  findCategoryById(@Param('id', ParseIntPipe) id: number) {
     // Lấy 1 loại món ăn bằng ID
-    return this.categoryService.findOne(id)
+    return this.categoryService.findOneOrThrow(id);
   }
 
   @Post()
@@ -26,14 +35,17 @@ export class CategoryController {
     return this.categoryService.create(dto);
   }
 
-  @Patch()
-  updateCategoryById(@Body() dto: UpdateCategoryDto, id: number)  {
+  @Patch(':id')
+  updateCategoryById(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCategoryDto,
+  ) {
     // Cập nhật 1 loại món ăn theo id
     return this.categoryService.update(id, dto);
   }
 
-  @Patch()
-  deleteLogicCategoryById(id: number) {
+  @Delete(':id')
+  deleteLogicCategoryById(@Param('id', ParseIntPipe) id: number) {
     // Xóa logic 1 loại món ăn
     return this.categoryService.delete(id);
   }

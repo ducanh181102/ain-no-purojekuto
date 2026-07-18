@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TableStatus } from '@prisma/client';
 
@@ -13,6 +13,7 @@ export class UpdateTableDto {
   @Type(()=>Number)
   @IsOptional()
   @IsNumber()
+  @Min(1)
   capacity?: number;
 
   // có thể gửi hoặc không

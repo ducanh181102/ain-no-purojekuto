@@ -8,13 +8,6 @@ export class UpdateOrderDto {
   @IsOptional()
   name?: string;
 
-  // ép kiểu về number
-  // buộc là number
-  @Type(()=>Number)
-  @IsOptional()
-  @IsNumber()
-  capacity?: number;
-
   // có thể gửi hoặc không
   // buộc là enum
   @IsOptional()

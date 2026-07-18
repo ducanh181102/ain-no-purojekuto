@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PaymentMethod, PaymentStatus } from '@prisma/client';
 
@@ -15,6 +15,7 @@ export class CreatePaymentDto {
   @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
+  @Min(1)
   amount!: number;
 
   // buộc là enum

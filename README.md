@@ -1,98 +1,281 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+## NOTE
+- Các methods có gắn * là methods liên quan đến luồng nghiệp vụ
+- Các methods có gắn ^ là methods common
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## RULES CODING
+1. Tuần thủ mỗi dòng code đều phải có comment
+2. Mỗi service sẽ đảm nhận làm việc với DB của table liên quan. Nếu muốn làm việc với table khác với service đang coding thì phải gọi xử lý từ service tương ứng với table đó. Ví dụ: Tạo đơn hàng có xử lý update trạng thái bàn, thì phải viết xử lý update bàn từ service Table rồi gọi sang.
+3. Quy tắc đặt tên
+- Route
++ Dùng [resource + id + action]
++ Ví dụ: PATCH /order-items/:id/confirm
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- Controller method
++ Dùng [action + domain object]
++ Ví dụ: confirmOrderItem()
 
-## Description
+- Service method
++ Dùng [action] ngắn gọn
++ Ví dụ: confirm()
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Module
++ Theo [domain]
++ Ví dụ: OrderItemModule
 
-## Project setup
+- Biến
++ Id: [đối tượng + Id]. Ví dụ: orderId <TH: Parameters chỉ có 1 biến id thì [id]>
++ Record lấy từ database dùng [tên đối tượng]. Ví dụ: order
++ Biến boolean: [is + hành động]. Ví dụ: isVailable
++ Mảng hoặc list danh sách: [đối tượng + s]. Ví dụ orders
 
-```bash
-$ npm install
-```
+## NGHIỆP VỤ HỆ THỐNG
 
-## Compile and run the project
+### 1. Quản lý danh mục món ăn
 
-```bash
-# development
-$ npm run start
+Admin hoặc nhân viên có quyền quản lý danh mục món ăn.
 
-# watch mode
-$ npm run start:dev
+Luồng xử lý:
+- Tạo danh mục món ăn
+- Cập nhật tên danh mục
+- Xóa mềm danh mục
+- Khi xóa danh mục, các món thuộc danh mục đó cũng cần được xử lý phù hợp
 
-# production mode
-$ npm run start:prod
-```
+Ví dụ danh mục:
+- Ốc
+- Sò
+- Nghêu
+- Hàu
+- Lẩu
+- Đồ uống
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+### 2. Quản lý món ăn
 
-# e2e tests
-$ npm run test:e2e
+Admin hoặc nhân viên tạo và quản lý menu món ăn.
 
-# test coverage
-$ npm run test:cov
-```
+Luồng xử lý:
+- Tạo món ăn
+- Gán món ăn vào danh mục
+- Cập nhật tên món, giá, hình ảnh
+- Cập nhật trạng thái còn bán / ngừng bán
+- Xóa mềm món ăn
 
-## Deployment
+Quy tắc:
+- Món ăn đã ngừng bán thì khách không được gọi món
+- Giá món khi gọi phải lấy từ database, không lấy từ client gửi lên
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 3. Quản lý bàn
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+Nhân viên quản lý trạng thái bàn trong quán.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Trạng thái bàn:
+- AVAILABLE: bàn trống
+- OCCUPIED: bàn đang có khách
+- RESERVED: bàn đã được đặt trước
 
-## Resources
+Luồng xử lý:
+- Tạo bàn
+- Cập nhật thông tin bàn
+- Đặt bàn trước
+- Mở bàn khi khách vào
+- Khi tạo order thành công, bàn chuyển sang OCCUPIED
+- Khi thanh toán thành công, bàn chuyển về AVAILABLE
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 4. Mở đơn hàng
 
-## Support
+Khi khách bắt đầu gọi món, hệ thống tạo một order cho bàn.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Luồng xử lý:
+- Nhận tableId
+- Kiểm tra bàn có tồn tại không
+- Kiểm tra bàn chưa bị xóa mềm
+- Kiểm tra bàn đang AVAILABLE
+- Tạo order mới
+- Cập nhật bàn sang OCCUPIED
 
-## Stay in touch
+Trạng thái order ban đầu:
+- PENDING
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Quy tắc:
+- Một bàn đang OCCUPIED không được mở thêm order mới nếu order cũ chưa thanh toán
+- Việc tạo order và cập nhật bàn phải nằm trong transaction
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 5. Gọi món
+
+Khách hoặc nhân viên thêm món vào order.
+
+Luồng xử lý:
+- Nhận orderId, dishId, quantity, note
+- Kiểm tra order có tồn tại không
+- Kiểm tra order chưa bị xóa mềm
+- Kiểm tra order chưa thanh toán hoặc chưa hủy
+- Kiểm tra món ăn có tồn tại không
+- Kiểm tra món ăn còn bán
+- Lấy giá hiện tại của món từ database
+- Tạo orderItem
+
+Trạng thái orderItem ban đầu:
+- PENDING
+
+Quy tắc:
+- Không nhận giá món từ client
+- Chỉ cho gọi món khi order còn hợp lệ
+- Nếu món hết bán thì không được thêm vào order
+- Quantity phải lớn hơn 0
+
+---
+
+### 6. Nhân viên xác nhận món
+
+Sau khi khách gọi món, nhân viên xác nhận món trước khi chuyển cho bếp.
+
+Luồng xử lý:
+- Nhận orderItemId
+- Kiểm tra orderItem có tồn tại không
+- Kiểm tra orderItem chưa bị xóa mềm
+- Kiểm tra trạng thái hiện tại là PENDING
+- Cập nhật trạng thái sang CONFIRMED
+
+Quy tắc trạng thái:
+- PENDING -> CONFIRMED: hợp lệ
+- Các trạng thái khác không được confirm lại
+
+---
+
+### 7. Bếp chế biến món
+
+Bếp xử lý từng món trong order.
+
+Luồng xử lý:
+- Món đã CONFIRMED thì bếp bắt đầu làm
+- Cập nhật trạng thái sang COOKING
+- Khi làm xong, cập nhật trạng thái sang READY
+
+Quy tắc trạng thái:
+- CONFIRMED -> COOKING
+- COOKING -> READY
+
+---
+
+### 8. Phục vụ món
+
+Nhân viên phục vụ món đã hoàn thành ra bàn.
+
+Luồng xử lý:
+- Nhận orderItemId
+- Kiểm tra orderItem đang READY
+- Cập nhật trạng thái sang SERVED
+
+Quy tắc trạng thái:
+- READY -> SERVED
+- Chỉ món READY mới được phục vụ
+
+---
+
+### 9. Hủy món
+
+Khách hoặc nhân viên có thể hủy món trong điều kiện phù hợp.
+
+Luồng xử lý:
+- Nhận orderItemId
+- Kiểm tra orderItem tồn tại
+- Kiểm tra trạng thái hiện tại
+- Nếu món chưa chế biến thì cho hủy
+- Cập nhật trạng thái sang CANCELLED
+
+Quy tắc:
+- PENDING -> CANCELLED: hợp lệ
+- CONFIRMED -> CANCELLED: có thể cho phép nếu bếp chưa làm
+- COOKING, READY, SERVED: không nên cho hủy
+
+---
+
+### 10. Thanh toán
+
+Khi khách yêu cầu tính tiền, nhân viên tạo thanh toán cho order.
+
+Luồng xử lý:
+- Nhận orderId
+- Kiểm tra order tồn tại
+- Kiểm tra order chưa thanh toán
+- Tính tổng tiền từ các orderItem chưa bị hủy
+- Tạo payment
+- Cập nhật payment status
+- Nếu thanh toán thành công:
+  - Order chuyển sang PAID
+  - Table chuyển sang AVAILABLE
+
+Quy tắc:
+- Không tính tiền các món đã CANCELLED
+- Không cho thanh toán order đã PAID
+- Thanh toán thành công phải nằm trong transaction với cập nhật order và table
+
+---
+
+### 11. Hủy đơn hàng
+
+Nhân viên hoặc admin có thể hủy cả order nếu order chưa thanh toán.
+
+Luồng xử lý:
+- Nhận orderId
+- Kiểm tra order tồn tại
+- Kiểm tra order chưa PAID
+- Cập nhật order sang CANCELLED
+- Cập nhật các orderItem chưa phục vụ sang CANCELLED
+- Cập nhật bàn về AVAILABLE nếu cần
+
+Quy tắc:
+- Order đã PAID không được hủy
+- Khi hủy order, cần xử lý đồng bộ orderItem và table trong transaction
+
+---
+
+### 12. Báo cáo
+
+Admin xem báo cáo vận hành và doanh thu.
+
+Các báo cáo cần có:
+- Doanh thu theo ngày
+- Số lượng order đã thanh toán
+- Món bán chạy
+- Món bị hủy nhiều
+- Bàn đang sử dụng
+- Phương thức thanh toán phổ biến
+
+---
+
+## LUỒNG TRẠNG THÁI
+
+### TableStatus
+
+AVAILABLE -> OCCUPIED
+AVAILABLE -> RESERVED
+RESERVED -> OCCUPIED
+OCCUPIED -> AVAILABLE
+
+### OrderStatus
+
+PENDING -> CONFIRMED
+CONFIRMED -> PREPARING
+PREPARING -> SERVED
+CONFIRMED -> PAID
+PREPARING -> PAID
+SERVED -> PAID
+
+PENDING -> CANCELLED
+
+### OrderItemStatus
+
+PENDING -> CONFIRMED
+CONFIRMED -> COOKING
+COOKING -> READY
+READY -> SERVED
+
+PENDING -> CANCELLED

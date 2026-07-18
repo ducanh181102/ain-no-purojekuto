@@ -22,24 +22,12 @@ export class CreateOrderItemDto {
   @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
+  @Min(1)
   quantity!: number;
-
-  // ép kiểu về number
-  // buộc là number
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  price!: number;
 
   // Có thể gửi hoặc không
   // buộc là String
   @IsOptional()
   @IsString()
   note?: string;
-
-  // buộc là string
-  // buộc là enum
-  @IsEnum(OrderItemStatus)
-  @IsOptional()
-  status?: OrderItemStatus;
 }

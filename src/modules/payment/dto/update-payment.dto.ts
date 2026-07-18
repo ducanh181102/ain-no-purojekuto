@@ -1,23 +1,23 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PaymentStatus } from '@prisma/client';
+import { PaymentMethod, PaymentStatus } from '@prisma/client';
 
 export class UpdatePaymentDto {
-  // buộc là string
-  @IsString()
-  @IsOptional()
-  name?: string;
-
   // ép kiểu về number
   // buộc là number
-  @Type(()=>Number)
-  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
-  capacity?: number;
+  @IsNotEmpty()
+  @Min(1)
+  amount?: number;
 
-  // có thể gửi hoặc không
   // buộc là enum
+  @IsEnum(PaymentMethod)
   @IsOptional()
+  method?: PaymentMethod;
+
+  // buộc là enum
   @IsEnum(PaymentStatus)
+  @IsOptional()
   status?: PaymentStatus;
 }

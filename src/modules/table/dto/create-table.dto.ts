@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TableStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
@@ -18,6 +18,7 @@ export class CreateTableDto {
   @Type(()=>Number)
   @IsOptional()
   @IsNumber()
+  @Min(1)
   capacity?: number;
 
   // có thể gửi hoặc không

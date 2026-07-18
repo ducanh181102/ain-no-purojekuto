@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderItemStatus } from '@prisma/client';
 
@@ -22,14 +22,16 @@ export class UpdateOrderItemDto {
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  quantity!: number;
+  @Min(1)
+  quantity?: number;
 
   // ép kiểu về number
   // buộc là number
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  price!: number;
+  @Min(1)
+  price?: number;
 
   // Có thể gửi hoặc không
   // buộc là String

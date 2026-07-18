@@ -4,12 +4,6 @@ import { OrderStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOrderDto {
-  // buộc là string
-  // buộc là enum
-  @IsEnum(OrderStatus)
-  @IsOptional()
-  status?: OrderStatus;
-
   // ép kiểu về number
   // buộc là number
   @Type(() => Number)
