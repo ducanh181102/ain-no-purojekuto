@@ -27,6 +27,11 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
+  // Fix bug chặn CORS khi call api từ brower khác origin
+  app.enableCors({
+    origin: 'http://localhost:3001',
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 

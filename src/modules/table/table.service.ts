@@ -22,6 +22,9 @@ export class TableService {
       where: {
         isDeleted: isDeleted,
       },
+      orderBy: {
+        id: 'asc',
+      }
     });
   }
 

@@ -1,3 +1,7 @@
+## BUILD PROJECT
+- docker compose up -d
+- npm run start:dev
+
 ## NOTE
 - Các methods có gắn * là methods liên quan đến luồng nghiệp vụ
 - Các methods có gắn ^ là methods common
