@@ -32,6 +32,13 @@ export class OrderController {
     return this.orderService.findOneOrThrow(id);
   }
 
+  @Get(':id/current-order-id')
+  async findCurrentOrderId(@Param('id', ParseIntPipe) id: number) {
+    const orderId = await this.orderService.findCurrentOrderId(id);
+
+    return { orderId };
+  }
+
   @Post()
   createOrder(@Body() dto: CreateOrderDto) {
     // Thêm một đơn hàng
