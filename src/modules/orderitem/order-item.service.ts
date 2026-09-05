@@ -1,10 +1,10 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderItem, OrderItemStatus, OrderStatus } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { DishService } from '../dish/dish.service';
+import { OrderService } from '../order/order.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
-import { OrderService } from '../order/order.service';
-import { DishService } from '../dish/dish.service';
 
 @Injectable()
 export class OrderItemService {
@@ -14,7 +14,7 @@ export class OrderItemService {
     @Inject(forwardRef(() => OrderService))
     private orderService: OrderService,
     private dishService: DishService,
-  ) {}
+  ) { }
 
   // Các phương thức CRUD cho OrderItem
   // Lấy tất cả chi tiết đơn hàng
@@ -24,6 +24,28 @@ export class OrderItemService {
     return this.prisma.orderItem.findMany({
       where: {
         isDeleted: isDeleted,
+      },
+      include: {
+        order: includeOrder,
+        dish: includeDish,
+      }
+    });
+  }
+
+  // Các phương thức CRUD cho OrderItem
+  // Lấy tất cả chi tiết đơn hàng
+  async findAllByOrder(
+    orderId: number,
+    includeOrder = false,
+    includeDish = false): Promise<OrderItem[]> {
+    // Khởi tạo biến chưa xóa là 2
+    const isDeleted = '2';
+    return this.prisma.orderItem.findMany({
+      where: {
+        isDeleted: isDeleted,
+        order: {
+          id: orderId,
+        },
       },
       include: {
         order: includeOrder,
@@ -166,17 +188,17 @@ export class OrderItemService {
   }
 
   // Xóa logic 1 chi tiết đơn hàng theo ID
-  async delete(id: number): Promise<OrderItem> { 
+  async delete(id: number): Promise<OrderItem> {
     // Tạo biến đã xóa là 1
     const isDeleted = '1';
     // Tạo biến ngày xóa
     const deleteAt = new Date();
     // Tạo biến data chứa thông tin fields
     const data = {
-      isDeleted: isDeleted, 
+      isDeleted: isDeleted,
       deleteAt: deleteAt,
     }
-    return this.prisma.orderItem.update({ where: { id }, data: data})
+    return this.prisma.orderItem.update({ where: { id }, data: data })
   }
 
   // Xóa một chi tiết đơn hàng theo ID
@@ -372,7 +394,7 @@ export class OrderItemService {
       OrderItemStatus.COOKING,
       OrderItemStatus.READY,
       OrderItemStatus.SERVED,
-      OrderItemStatus.CONFIRMED,      
+      OrderItemStatus.CONFIRMED,
     ];
 
     // 2. Kiểm tra có tồn tại

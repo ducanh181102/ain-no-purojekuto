@@ -17,7 +17,7 @@ import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 @Controller('order-items')
 export class OrderItemController {
   // Đưa OrderItemService vào để sử dụng trong controller
-  constructor(private readonly orderItemService: OrderItemService) {}
+  constructor(private readonly orderItemService: OrderItemService) { }
 
   @Get()
   findOrderItemAll(
@@ -27,6 +27,19 @@ export class OrderItemController {
     // Lấy tất cả chi tiết đơn hàng từ orderService
     return this.orderItemService.findAll(
       // toán tử đảm bảo trị luôn là true/false
+      includeOrder === 'true',
+      includeDish === 'true',
+    );
+  }
+
+  @Get('order/:orderId')
+  findAllByOrder(
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @Query('includeOrder') includeOrder?: string,
+    @Query('includeDish') includeDish?: string,
+  ) {
+    return this.orderItemService.findAllByOrder(
+      orderId,
       includeOrder === 'true',
       includeDish === 'true',
     );
