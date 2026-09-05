@@ -9,9 +9,9 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { TableService } from './table.service';
 
 @Controller('tables')
 export class TableController {

@@ -56,6 +56,24 @@ export class OrderService {
 
     // 4. Trả trị
     return order;
+  } 
+
+  // Lấy đơn hàng có thông tin
+  async findCurrentOrderId(tableId: number): Promise<number> {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        tableId,
+        status: {
+          notIn: ['PAID', 'CANCELLED'],
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Bàn hiện chưa có order đang mở');
+    }
+
+    return order.id;
   }
 
   // * Tạo mới một đơn hàng
