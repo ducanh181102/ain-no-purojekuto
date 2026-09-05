@@ -45,6 +45,12 @@ export class OrderItemController {
     );
   }
 
+  @Get('order/:orderId/total')
+  getTotalAmountByOrder(@Param('orderId', ParseIntPipe) orderId: number) {
+    // Lấy tổng tiền chi tiết đơn hàng theo orderId
+    return this.orderItemService.getTotalAmountByOrder(orderId);
+  }
+
   @Get(':id')
   findOrderItemById(@Param('id', ParseIntPipe) id: number) {
     // Lấy 1 chi tiết đơn hàng bằng ID

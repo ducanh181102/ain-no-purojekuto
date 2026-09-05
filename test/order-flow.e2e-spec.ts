@@ -149,6 +149,10 @@ describe('Order Flow (e2e)', () => {
     return request(httpServer).patch(`/orders/${id}/pay`).send(body);
   }
 
+  function getOrderItemTotal(orderId: number) {
+    return request(httpServer).get(`/order-items/order/${orderId}/total`).send();
+  }
+
   async function getOrder(id: number) {
     return request(httpServer).get(`/orders/${id}`).expect(200);
   }
@@ -306,6 +310,40 @@ describe('Order Flow (e2e)', () => {
           quantity: 1,
         })
         .expect(400);
+    });
+
+    it('gets total amount from active order items', async () => {
+      const table = await createTable();
+      const order = await createOrder(table.body.id);
+      await createOrderItem(order.body.id, dishIds[0], {
+        quantity: 2,
+      });
+      await createOrderItem(order.body.id, dishIds[1], {
+        quantity: 3,
+      });
+
+      const response = await getOrderItemTotal(order.body.id).expect(200);
+
+      expect(response.body.orderId).toBe(order.body.id);
+      expect(response.body.total).toBe(80000);
+    });
+
+    it('excludes cancelled items when getting total amount', async () => {
+      const table = await createTable();
+      const order = await createOrder(table.body.id);
+      const cancelledItem = await createOrderItem(order.body.id, dishIds[0], {
+        quantity: 10,
+      });
+      await createOrderItem(order.body.id, dishIds[1], {
+        quantity: 2,
+      });
+
+      await cancelOrderItem(cancelledItem.body.id).expect(200);
+
+      const response = await getOrderItemTotal(order.body.id).expect(200);
+
+      expect(response.body.orderId).toBe(order.body.id);
+      expect(response.body.total).toBe(40000);
     });
   });
 

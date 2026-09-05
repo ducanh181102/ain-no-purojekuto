@@ -54,6 +54,21 @@ export class OrderItemService {
     });
   }
 
+  // Lấy tổng tiền chi tiết đơn hàng theo orderId
+  async getTotalAmountByOrder(orderId: number): Promise<{ orderId: number; total: number }> {
+    // 1. Kiểm tra order có tồn tại
+    await this.orderService.checkExist(orderId);
+
+    // 2. Tính tổng tiền các món trong order
+    const total = await this.calculateToTalAmount(orderId);
+
+    // 3. Trả về orderId và tổng tiền
+    return {
+      orderId,
+      total,
+    };
+  }
+
   // Lấy các món trong đơn hàng theo trạng thái
   async findByOrderId(orderId: number, status: OrderItemStatus, valid = true): Promise<OrderItem[]> {
     // 1. Lấy thông tin orderItems
