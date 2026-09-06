@@ -43,6 +43,13 @@ enum TableStatus {
   RESERVED
 }
 
+enum ReservationStatus {
+  RESERVED
+  CHECKED_IN
+  CANCELLED
+  EXPIRED
+}
+
 model Category {
   id   Int    @id @default(autoincrement())
   name String
@@ -85,6 +92,7 @@ model Table {
   status TableStatus @default(AVAILABLE)
 
   orders Order[]
+  reservations Reservation[]
 
   isDeleted String    @default("2")
   deleteAt  DateTime?
@@ -104,11 +112,40 @@ model Order {
 
   payment Payment?
 
+  reservation Reservation?
+
   isDeleted String    @default("2")
   deleteAt  DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Reservation {
+  id Int @id @default(autoincrement())
+
+  tableId Int
+  table   Table @relation(fields: [tableId], references: [id])
+
+  orderId Int?   @unique
+  order   Order? @relation(fields: [orderId], references: [id])
+
+  customerName String
+  phone        String?
+  guestCount   Int?
+  reservedAt   DateTime
+  note         String?
+
+  status ReservationStatus @default(RESERVED)
+
+  isDeleted String    @default("2")
+  deleteAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tableId, status])
+  @@index([reservedAt])
 }
 
 model OrderItem {
