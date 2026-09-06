@@ -110,7 +110,7 @@ export class TableService {
   async checkStatus(order: Table | null, status: TableStatus, valid: boolean): Promise<void> {
     // Xử lsy kiểm tra
     if ((!valid && order?.status === status) || (valid && order?.status !== status)) {
-      throw new BadRequestException('Trạng thái của đơn hàng không hợp lệ');
+      throw new BadRequestException('Trạng thái của bàn không hợp lệ');
     }
   }
 
@@ -140,6 +140,32 @@ export class TableService {
     return updateTable;
   }
 
+  // * Chuyển trạng thái cho bàn thành đã đặt trước
+  async reserved(id: number, tx?: Prisma.TransactionClient): Promise<Table> {
+    // 1. Chuẩn bị data
+    // a. Tạo biến valid là kiểm tra phù hợp
+    const valid = true;
+    // b. Chuẩn bị data update
+    const data = {
+      status: TableStatus.RESERVED,
+    }
+
+    // 2. Kiểm tra có tồn tại
+    await this.checkExist(id)
+
+    // 3. Tìm table theo id
+    const table = await this.findOne(id);
+
+    // 4. Kiểm tra trạng thái hiện tại phải là trống
+    await this.checkStatus(table, TableStatus.AVAILABLE, valid);
+
+    // 5. Cập nhật status sang là đã đặt trước
+    const updateTable = await this.update(id, data, tx)
+
+    // 6. Trả về table đã cập nhật
+    return updateTable;
+  }
+
   // * Chuyển trạng thái cho bàn thành có sẵn
   async available(id: number, tx?: Prisma.TransactionClient): Promise<Table> {
     // 1. Chuẩn bị data
@@ -158,6 +184,32 @@ export class TableService {
 
     // 4. Kiểm tra trạng thái hiện tại phải là đã phục vụ
     await this.checkStatus(table, TableStatus.OCCUPIED, valid);
+
+    // 5. Cập nhật status sang là có sẵn
+    const updateTable = await this.update(id, data, tx)
+
+    // 6. Trả về table đã cập nhật
+    return updateTable;
+  }
+
+  // * Chuyển trạng thái cho bàn đặt trước thành có sẵn
+  async availableFromReserved(id: number, tx?: Prisma.TransactionClient): Promise<Table> {
+    // 1. Chuẩn bị data
+    // a. Tạo biến valid là kiểm tra phù hợp
+    const valid = true;
+    // b. Chuẩn bị data update
+    const data = {
+      status: TableStatus.AVAILABLE,
+    }
+
+    // 2. Kiểm tra có tồn tại
+    await this.checkExist(id)
+
+    // 3. Tìm table theo id
+    const table = await this.findOne(id);
+
+    // 4. Kiểm tra trạng thái hiện tại phải là đã đặt trước
+    await this.checkStatus(table, TableStatus.RESERVED, valid);
 
     // 5. Cập nhật status sang là có sẵn
     const updateTable = await this.update(id, data, tx)

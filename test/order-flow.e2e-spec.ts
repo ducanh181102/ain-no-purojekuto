@@ -149,6 +149,33 @@ describe('Order Flow (e2e)', () => {
     return request(httpServer).patch(`/orders/${id}/pay`).send(body);
   }
 
+  function createReservation(tableId: number, body: Record<string, unknown> = {}) {
+    return request(httpServer)
+      .post('/reservations')
+      .send({
+        tableId,
+        customerName: unique('Khach dat ban'),
+        phone: '0908123456',
+        guestCount: 4,
+        reservedAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+        ...body,
+      });
+  }
+
+  function checkInReservation(id: number) {
+    return request(httpServer).patch(`/reservations/${id}/check-in`).send();
+  }
+
+  function moveReservation(id: number, tableId: number) {
+    return request(httpServer)
+      .patch(`/reservations/${id}/move-table`)
+      .send({ tableId });
+  }
+
+  function cancelReservation(id: number) {
+    return request(httpServer).patch(`/reservations/${id}/cancel`).send();
+  }
+
   function getOrderItemTotal(orderId: number) {
     return request(httpServer).get(`/order-items/order/${orderId}/total`).send();
   }
@@ -222,6 +249,64 @@ describe('Order Flow (e2e)', () => {
         .patch(`/tables/${table.body.id}`)
         .send({ status: 'OCCUPIED' })
         .expect(400);
+    });
+  });
+
+  describe('Reservation rules', () => {
+    it('creates a reservation and changes table status to RESERVED', async () => {
+      const table = await createTable();
+      const reservation = await createReservation(table.body.id).expect(201);
+      const updatedTable = await getTable(table.body.id);
+
+      expect(reservation.body.status).toBe('RESERVED');
+      expect(updatedTable.body.status).toBe('RESERVED');
+    });
+
+    it('does not allow creating an order directly on a RESERVED table', async () => {
+      const table = await createTable();
+      await createReservation(table.body.id).expect(201);
+
+      await request(httpServer)
+        .post('/orders')
+        .send({ tableId: table.body.id })
+        .expect(400);
+    });
+
+    it('checks in a reservation by creating an order and occupying the table', async () => {
+      const table = await createTable();
+      const reservation = await createReservation(table.body.id).expect(201);
+
+      const checkedInReservation = await checkInReservation(reservation.body.id).expect(200);
+      const updatedTable = await getTable(table.body.id);
+
+      expect(checkedInReservation.body.status).toBe('CHECKED_IN');
+      expect(checkedInReservation.body.order.status).toBe('PENDING');
+      expect(updatedTable.body.status).toBe('OCCUPIED');
+    });
+
+    it('moves an active reservation to another available table', async () => {
+      const oldTable = await createTable();
+      const newTable = await createTable();
+      const reservation = await createReservation(oldTable.body.id).expect(201);
+
+      const movedReservation = await moveReservation(reservation.body.id, newTable.body.id).expect(200);
+      const oldTableAfterMove = await getTable(oldTable.body.id);
+      const newTableAfterMove = await getTable(newTable.body.id);
+
+      expect(movedReservation.body.tableId).toBe(newTable.body.id);
+      expect(oldTableAfterMove.body.status).toBe('AVAILABLE');
+      expect(newTableAfterMove.body.status).toBe('RESERVED');
+    });
+
+    it('cancels an active reservation and releases the table', async () => {
+      const table = await createTable();
+      const reservation = await createReservation(table.body.id).expect(201);
+
+      const cancelledReservation = await cancelReservation(reservation.body.id).expect(200);
+      const updatedTable = await getTable(table.body.id);
+
+      expect(cancelledReservation.body.status).toBe('CANCELLED');
+      expect(updatedTable.body.status).toBe('AVAILABLE');
     });
   });
 
