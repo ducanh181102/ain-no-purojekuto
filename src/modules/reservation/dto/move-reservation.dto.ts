@@ -8,4 +8,8 @@ export class MoveReservationDto {
   @IsNumber()
   @IsNotEmpty()
   tableId!: number;
+
+  // ép kiểu về string
+  @Type(() => String)
+  reason?: string;
 }
