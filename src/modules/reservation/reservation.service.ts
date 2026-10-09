@@ -279,7 +279,7 @@ export class ReservationService {
               id: dto.tableId,
             },
           },
-          note: dto.reason ? `${reservation.note || ''}\nLý do đổi bàn: ${dto.reason}` : reservation.note,
+          note: dto.reason ? `Lý do đổi bàn: ${dto.reason}` : reservation.note,
         },
       });
 
