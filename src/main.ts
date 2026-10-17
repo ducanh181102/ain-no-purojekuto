@@ -1,8 +1,8 @@
-import 'dotenv/config';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import 'dotenv/config';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,8 +29,8 @@ async function bootstrap() {
 
   // Fix bug chặn CORS khi call api từ brower khác origin
   app.enableCors({
-    origin: 'http://localhost:3002',
-  });
+    origin: 'http://localhost:3000',
+  },);
 
   await app.listen(process.env.PORT ?? 3000);
 }
