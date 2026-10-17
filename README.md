@@ -1,3 +1,6 @@
+## LINK DOCCUMENT
+https://docs.google.com/spreadsheets/d/1dB1I0eO2TWPZcmnFRm2Uiu0EFvyS8eAp/edit?gid=1729471809#gid=1729471809
+
 ## BUILD PROJECT
 - docker compose up -d
 - npm run start:dev
