@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_2_POOLED_DATABASE_URL")
-  directUrl = env("DATABASE_2_PRISMA_DATABASE_URL")
+  url       = env("DATABASE_03_POOLED_DATABASE_URL")
+  directUrl = env("DATABASE_03_PRISMA_DATABASE_URL")
 }
 
 enum OrderStatus {
